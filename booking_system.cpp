@@ -11,10 +11,25 @@ namespace {
         explicit THotelPlan(TRoomCounts roomCounts)
             : RoomCounts(std::move(roomCounts))
         {
+            // TODO Один раз задать список enum-а
+            if (!RoomCounts.count(ERoomType::Single)) {
+                throw std::runtime_error("Single room count is not set");
+            }
+            if (!RoomCounts.count(ERoomType::Double)) {
+                throw std::runtime_error("Double room count is not set");
+            }
+            BusyRooms[ERoomType::Single];
+            BusyRooms[ERoomType::Double];
         }
 
         bool Has(ERoomType roomType, unsigned dayFrom, unsigned dayTo) const {
+            if (RoomCounts.at(roomType) == 0) {
+                return false;
+            }
             for (unsigned day = dayFrom; day <= dayTo; ++day) {
+                if (!BusyRooms.at(roomType).count(day)) {
+                    continue;
+                }
                 if (BusyRooms.at(roomType).at(day).size() == RoomCounts.at(roomType)) {
                     return false;
                 }
@@ -24,6 +39,7 @@ namespace {
 
         void Book(TUserId userId, ERoomType roomType, unsigned dayFrom, unsigned dayTo) {
             for (unsigned day = dayFrom; day <= dayTo; ++day) {
+                BusyRooms[roomType][day];
                 if (BusyRooms.at(roomType).at(day).size() == RoomCounts.at(roomType)) {
                     throw std::runtime_error(
                         "All rooms of type " + std::to_string(static_cast<int>(roomType)) +
@@ -36,6 +52,9 @@ namespace {
 
         bool HasBooking(TUserId userId, ERoomType roomType, unsigned dayFrom, unsigned dayTo) const {
             for (unsigned day = dayFrom; day <= dayTo; ++day) {
+                if (!BusyRooms.at(roomType).count(day)) {
+                    return false;
+                }
                 if (BusyRooms.at(roomType).at(day).count(userId) == 0) {
                     return false;
                 }
@@ -61,6 +80,7 @@ namespace {
         bool Book(const TBooking& booking) override {
             if (HotelPlan.Has(booking.RoomType, booking.DayFrom, booking.DayTo)) {
                 HotelPlan.Book(booking.UserId, booking.RoomType, booking.DayFrom, booking.DayTo);
+                return true;
             }
             return false;
         }

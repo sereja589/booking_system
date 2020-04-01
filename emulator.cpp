@@ -20,23 +20,30 @@ namespace {
 
         void MakeStep() override {
             const auto currentTime = Context.Clock.GetTime();
+            if (currentTime.Day > 0) {
+                HandleCheckoutActions(currentTime.Day);
+            }
             HandleCheckinActions(currentTime.Day);
             GenerateBookings(currentTime);
         }
 
     private:
         void HandleCheckinActions(unsigned currentDay) {
+            Checkins[currentDay];
             for (const auto& booking : Checkins.at(currentDay)) {
                 const auto success = Context.BookingSystem.CheckInto(booking);
                 ObserveCheckin(booking, success);
             }
+            Checkins[currentDay].clear();
         }
 
         void HandleCheckoutActions(unsigned currentDay) {
+            Checkouts[currentDay];
             for (const auto& booking : Checkouts.at(currentDay)) {
                 const auto cost = Context.BookingSystem.GetBill(booking);
                 ObserveCheckout(booking, cost);
             }
+            Checkouts[currentDay].clear();
         }
 
         void GenerateBookings(IClock::TTime currentTime) {
@@ -51,7 +58,7 @@ namespace {
                 ObserveBook(booking, success);
                 if (success) {
                     Checkins[booking.DayFrom].push_back(booking);
-                    Checkouts[booking.DayTo].push_back(booking);
+                    Checkouts[booking.DayTo + 1].push_back(booking);
                 }
                 SetNextBookingTime(currentTime);
             }

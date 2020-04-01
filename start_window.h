@@ -34,13 +34,21 @@ private slots:
 private:
     unsigned GetEmulateStep() const;
 
-    void OnBook(const TBooking &booking, bool success) override;
-    void OnCheckin(const TBooking &booking, bool success) override;
-    void OnCheckout(const TBooking &booking, TCost cost) override;
+    void OnBook(const TBooking& booking, bool success) override;
+    void OnCheckin(const TBooking& booking, bool success) override;
+    void OnCheckout(const TBooking& booking, TCost cost) override;
+
+    void DisplayRoomCounts();
+    void DisplayTime();
+    void DisplayProfit();
 
 private:
-    Ui::TStartWindow *ui;
+    Ui::TStartWindow* ui;
     std::unique_ptr<TClock> Clock;
+    TRoomCosts RoomCosts;
+    TRoomCounts RoomCounts;
+    TRoomCounts BusyRooms;
+    TCost TotalProfit = 0;
     std::unique_ptr<IBookingSystem> BookingSystem;
     std::unique_ptr<IEmulator> Emulator;
 };

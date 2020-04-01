@@ -6,9 +6,8 @@
 
 enum class ERoomType {
     Single,
-    Lux,
-    HalfLux,
-    // ...
+    Double
+    // ... TODO
 };
 
 using TRoomCounts = std::unordered_map<ERoomType, unsigned>;
