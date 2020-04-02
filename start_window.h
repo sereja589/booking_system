@@ -2,6 +2,7 @@
 #define TSTARTWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
 #include "emulator.h"
 #include <memory>
 
@@ -17,6 +18,21 @@ public:
 
 private:
     std::atomic_uint Hours{0};
+};
+
+struct TBookingEvent {
+    TBooking Booking;
+    bool Success;
+};
+
+struct TCheckinEvent {
+    TBooking Booking;
+    bool Success;
+};
+
+struct TCheckoutEvent {
+    TBooking Booking;
+    TCost Cost;
 };
 
 class TStartWindow : public QMainWindow, public IEmulatorObserver
@@ -42,13 +58,23 @@ private:
     void DisplayTime();
     void DisplayProfit();
 
+    void ClearEvents();
+    void DisplayLastEvents();
+
 private:
     Ui::TStartWindow* ui;
-    std::unique_ptr<TClock> Clock;
+
     TRoomCosts RoomCosts;
     TRoomCounts RoomCounts;
     TRoomCounts BusyRooms;
+
     TCost TotalProfit = 0;
+
+    std::vector<TBookingEvent> Bookings;
+    std::vector<TCheckinEvent> Checkins;
+    std::vector<TCheckoutEvent> Checkouts;
+
+    std::unique_ptr<TClock> Clock;
     std::unique_ptr<IBookingSystem> BookingSystem;
     std::unique_ptr<IEmulator> Emulator;
 };

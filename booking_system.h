@@ -5,10 +5,13 @@
 #include <unordered_map>
 
 enum class ERoomType {
-    Single,
-    Double
+    Single = 0,
+    Double,
     // ... TODO
+    Count
 };
+
+std::string RoomTypeToString(ERoomType roomType);
 
 using TRoomCounts = std::unordered_map<ERoomType, unsigned>;
 using TCost = unsigned;

@@ -190,6 +190,16 @@
         </item>
        </layout>
       </widget>
+      <widget class="QTextBrowser" name="ActionView">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>30</y>
+         <width>411</width>
+         <height>191</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -209,7 +219,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="StopEmulation">
         <property name="text">
          <string>Стоп</string>
         </property>

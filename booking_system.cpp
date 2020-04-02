@@ -112,6 +112,15 @@ namespace {
     };
 }
 
+std::string RoomTypeToString(ERoomType roomType) {
+    switch (roomType) {
+        case ERoomType::Single:
+            return "single";
+        case ERoomType::Double:
+            return "double";
+    }
+}
+
 std::unique_ptr<IBookingSystem> IBookingSystem::Create(
     TRoomCounts roomCounts,
     TRoomCosts roomCosts,

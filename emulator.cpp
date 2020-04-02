@@ -53,7 +53,7 @@ namespace {
                 ++UserId;
                 booking.DayFrom = currentTime.Day + DaysUntilBookingDistribution(RandomGenerator);
                 booking.DayTo = booking.DayFrom + BookingDurationDistribution(RandomGenerator) - 1;
-                booking.RoomType = ERoomType::Single;   // TODO Choose randomly
+                booking.RoomType = GenerateRoomType();
                 const auto success = Context.BookingSystem.Book(booking);
                 ObserveBook(booking, success);
                 if (success) {
@@ -97,6 +97,10 @@ namespace {
             return {l.Day + r.Day + (l.Hour + r.Hour) / HOURS_IN_DAY, (l.Hour + r.Hour) % HOURS_IN_DAY};
         }
 
+        ERoomType GenerateRoomType() {
+            return static_cast<ERoomType>(RoomTypeDistribution(RandomGenerator));
+        }
+
     private:
         const TContext Context;
         std::vector<IEmulatorObserver*> Observers;
@@ -107,6 +111,7 @@ namespace {
         std::uniform_int_distribution<unsigned> DistributionOfIntervalBetweenBookings{1, 5};
         std::uniform_int_distribution<unsigned> DaysUntilBookingDistribution{1, 10};
         std::uniform_int_distribution<unsigned> BookingDurationDistribution{1, 10};
+        std::uniform_int_distribution<int> RoomTypeDistribution{0, static_cast<int>(ERoomType::Count) - 1};
         TUserId UserId = 0;
     };
 }
