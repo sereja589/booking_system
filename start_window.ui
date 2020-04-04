@@ -36,16 +36,32 @@
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="2" column="1">
-         <widget class="QLineEdit" name="SingleRoomCost"/>
+         <widget class="QLineEdit" name="SingleRoomCost">
+          <property name="text">
+           <string>3000</string>
+          </property>
+         </widget>
         </item>
         <item row="4" column="2">
-         <widget class="QLineEdit" name="lineEdit_2"/>
+         <widget class="QLineEdit" name="DoubleRoomCount">
+          <property name="text">
+           <string>8</string>
+          </property>
+         </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QLineEdit" name="DoubleRoomCost"/>
+         <widget class="QLineEdit" name="DoubleRoomCost">
+          <property name="text">
+           <string>4500</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="2">
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="SingleRoomCount">
+          <property name="text">
+           <string>12</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_3">
@@ -90,7 +106,11 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="EmulationStep"/>
+         <widget class="QLineEdit" name="EmulationStep">
+          <property name="text">
+           <string>12</string>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_7">

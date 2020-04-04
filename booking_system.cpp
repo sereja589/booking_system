@@ -11,12 +11,10 @@ namespace {
         explicit THotelPlan(TRoomCounts roomCounts)
             : RoomCounts(std::move(roomCounts))
         {
-            // TODO Один раз задать список enum-а
-            if (!RoomCounts.count(ERoomType::Single)) {
-                throw std::runtime_error("Single room count is not set");
-            }
-            if (!RoomCounts.count(ERoomType::Double)) {
-                throw std::runtime_error("Double room count is not set");
+            for (const auto roomType : ROOM_TYPES) {
+                if (!RoomCounts.count(roomType)) {
+                    throw std::runtime_error("Room count is not set for type " + RoomTypeToString(roomType));
+                }
             }
             BusyRooms[ERoomType::Single];
             BusyRooms[ERoomType::Double];
@@ -114,10 +112,9 @@ namespace {
 
 std::string RoomTypeToString(ERoomType roomType) {
     switch (roomType) {
-        case ERoomType::Single:
-            return "single";
-        case ERoomType::Double:
-            return "double";
+        #define X(Id) case ERoomType::Id: return #Id;
+            ROOMS
+        #undef X
     }
 }
 

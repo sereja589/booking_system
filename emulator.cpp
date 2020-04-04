@@ -111,7 +111,7 @@ namespace {
         std::uniform_int_distribution<unsigned> DistributionOfIntervalBetweenBookings{1, 5};
         std::uniform_int_distribution<unsigned> DaysUntilBookingDistribution{1, 10};
         std::uniform_int_distribution<unsigned> BookingDurationDistribution{1, 10};
-        std::uniform_int_distribution<int> RoomTypeDistribution{0, static_cast<int>(ERoomType::Count) - 1};
+        std::uniform_int_distribution<int> RoomTypeDistribution{0, static_cast<int>(ROOM_TYPES.size()) - 1};
         TUserId UserId = 0;
     };
 }

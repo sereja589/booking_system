@@ -1,14 +1,24 @@
 #pragma once
 
 #include "clock.h"
+#include <array>
 #include <memory>
 #include <unordered_map>
 
+#define ROOMS \
+    X(Single) \
+    X(Double)
+
 enum class ERoomType {
-    Single = 0,
-    Double,
-    // ... TODO
-    Count
+#define X(Id) Id,
+    ROOMS
+#undef X
+};
+
+constexpr std::array ROOM_TYPES {
+#define X(Id) ERoomType::Id,
+    ROOMS
+#undef X
 };
 
 std::string RoomTypeToString(ERoomType roomType);

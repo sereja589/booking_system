@@ -1,8 +1,8 @@
 #ifndef TSTARTWINDOW_H
 #define TSTARTWINDOW_H
 
+#include <QLineEdit>
 #include <QMainWindow>
-#include <QGraphicsScene>
 #include "emulator.h"
 #include <memory>
 
@@ -35,6 +35,60 @@ struct TCheckoutEvent {
     TCost Cost;
 };
 
+class THotelStats {
+public:
+    THotelStats(const TRoomCounts& roomCounts)
+        : RoomCounts(roomCounts)
+    {
+    }
+
+    void AddAcceptedBooking() {
+        ++AcceptedBookings;
+    }
+
+    void AddRejectedBooking() {
+        ++RejectedBookings;
+    }
+
+    unsigned GetAcceptedBookings() const {
+        return AcceptedBookings;
+    }
+
+    unsigned GetTotalBookings() const {
+        return AcceptedBookings + RejectedBookings;
+    }
+
+    void AddRoomsOccupanccy(ERoomType roomType, unsigned day, double occupancy) {
+        if (RoomsOccupancy[roomType].size() <= day) {
+            RoomsOccupancy[roomType].resize(day + 1);
+        }
+        RoomsOccupancy[roomType][day] = occupancy;
+    }
+
+    double GetRoomOccupancy(ERoomType roomType) const {
+        const auto& occupancy = RoomsOccupancy.at(roomType);
+        return std::reduce(occupancy.begin(), occupancy.end()) / occupancy.size();
+    }
+
+    // Можно ли так?
+    double GetRoomOccupancy() const {
+        double occupancy = 0;
+        unsigned totalRoomCounts = 0;
+        for (const auto roomType : ROOM_TYPES) {
+            occupancy += RoomCounts.at(roomType) * GetRoomOccupancy(roomType);
+            totalRoomCounts += RoomCounts.at(roomType);
+        }
+        return occupancy / totalRoomCounts;
+    }
+
+private:
+    const TRoomCounts& RoomCounts;
+
+    unsigned AcceptedBookings = 0;
+    unsigned RejectedBookings = 0;
+    std::unordered_map<ERoomType, std::vector<double>> RoomsOccupancy;
+};
+
 class TStartWindow : public QMainWindow, public IEmulatorObserver
 {
     Q_OBJECT
@@ -46,9 +100,12 @@ public:
 private slots:
     void on_StartEmulate_clicked();
     void on_MakeStep_clicked();
+    void on_StopEmulation_clicked();
 
 private:
     unsigned GetEmulateStep() const;
+    void InitRoomCounts();
+    void InitRoomCosts();
 
     void OnBook(const TBooking& booking, bool success) override;
     void OnCheckin(const TBooking& booking, bool success) override;
@@ -61,8 +118,13 @@ private:
     void ClearEvents();
     void DisplayLastEvents();
 
+    void DisplayStat();
+
 private:
     Ui::TStartWindow* ui;
+
+    std::unordered_map<ERoomType, const QLineEdit*> RoomCountInputs;
+    std::unordered_map<ERoomType, const QLineEdit*> RoomCostInputs;
 
     TRoomCosts RoomCosts;
     TRoomCounts RoomCounts;
@@ -73,6 +135,8 @@ private:
     std::vector<TBookingEvent> Bookings;
     std::vector<TCheckinEvent> Checkins;
     std::vector<TCheckoutEvent> Checkouts;
+
+    std::unique_ptr<THotelStats> HotelStats;
 
     std::unique_ptr<TClock> Clock;
     std::unique_ptr<IBookingSystem> BookingSystem;
