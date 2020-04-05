@@ -10,28 +10,68 @@
 namespace  {
     constexpr unsigned HOURS_IN_DAY = 24;
 
+    enum ECase {
+        Genitive,
+        Accusative
+    };
+
+    std::string RussianRoomType(ERoomType roomType, ECase aCase) {
+        switch (roomType) {
+            case ERoomType::Single:
+                if (aCase == ECase::Accusative) {
+                    return "одноместную комнату";
+                } else {
+                    return "одноместной комнаты";
+                }
+            case ERoomType::Double:
+                if (aCase == ECase::Accusative) {
+                    return "двухместную комнату";
+                } else {
+                    return "двухместной комнаты";
+                }
+            case ERoomType::DoubleWithSofa:
+                if (aCase == ECase::Accusative) {
+                    return "двухместную комнату с диваном";
+                } else {
+                    return "двухместной комнаты c диваном";
+                }
+            case ERoomType::HalfLux:
+                if (aCase == ECase::Accusative) {
+                    return "полулюкс";
+                } else {
+                    return "полулюкса";
+                }
+            case ERoomType::Lux:
+                if (aCase == ECase::Accusative) {
+                    return "люкс";
+                } else {
+                    return "люкса";
+                }
+        }
+    }
+
     std::string BuildBookingEventText(const TBookingEvent& bookingEvent) {
-        const std::string successStr = bookingEvent.Success ? "successfully" : "unsuccessfully";
+        const std::string bookStr = bookingEvent.Success ? "забронировал" : "не смог забронировать";
         std::stringstream text;
-        text << "User " << bookingEvent.Booking.UserId << " books room "
-            << RoomTypeToString(bookingEvent.Booking.RoomType) << "\n"
-            << "from " << bookingEvent.Booking.DayFrom << " to " << bookingEvent.Booking.DayTo << ' ' << successStr;
+        text << "Гость " << bookingEvent.Booking.UserId << ' ' << bookStr << ' '
+            << RussianRoomType(bookingEvent.Booking.RoomType, ECase::Accusative)
+            << " с " << bookingEvent.Booking.DayFrom << " по " << bookingEvent.Booking.DayTo;
         return text.str();
     }
 
     std::string BuildCheckinEventText(const TCheckinEvent& checkinEvent) {
-        const std::string successStr = checkinEvent.Success ? "successfully" : "unsuccessfully";
+        const std::string checkinStr = checkinEvent.Success ? "заселился" : "не смог заселиться";
         std::stringstream text;
-        text << "User " << checkinEvent.Booking.UserId << " checkin "
-            << RoomTypeToString(checkinEvent.Booking.RoomType) << "\n"
-            << "from " << checkinEvent.Booking.DayFrom << " to " << checkinEvent.Booking.DayTo << ' ' << successStr;
+        text << "Гость " << checkinEvent.Booking.UserId << ' ' << checkinStr << " в "
+            << RussianRoomType(checkinEvent.Booking.RoomType, ECase::Accusative) << ' '
+            << "с " << checkinEvent.Booking.DayFrom << " по " << checkinEvent.Booking.DayTo;
         return text.str();
     }
 
     std::string BuildCheckoutEventText(const TCheckoutEvent& checkoutEvent) {
         std::stringstream text;
-        text << "User " << checkoutEvent.Booking.UserId << " checkout "
-            << RoomTypeToString(checkoutEvent.Booking.RoomType) << ", bill " << checkoutEvent.Cost;
+        text << "Гость " << checkoutEvent.Booking.UserId << " выселился из "
+            << RussianRoomType(checkoutEvent.Booking.RoomType, ECase::Genitive) << ", счет " << checkoutEvent.Cost << " руб";
         return text.str();
     }
 }
@@ -266,7 +306,7 @@ void TStartWindow::DisplayLastEvents() {
 
 void TStartWindow::DisplayStat() {
     std::stringstream text;
-    text << "Всего бронирований: " << HotelStats->GetTotalBookings() << "<br>";
+
     text << "Из них подтверждено: " << HotelStats->GetAcceptedBookings() << "<br>";
     text << "Загрузка гостиницы:<br>";
     for (const auto roomType : ROOM_TYPES) {
