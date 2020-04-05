@@ -35,10 +35,76 @@
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="SingleRoomCount">
+          <property name="text">
+           <string>12</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Стоимости номеров</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="DoubleWithSofaRoomCost">
+          <property name="text">
+           <string>5000</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QLineEdit" name="DoubleWithSofaRoomCount">
+          <property name="text">
+           <string>4</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Двуместный с диваном</string>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="SingleRoomCost">
           <property name="text">
            <string>3000</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Одноместный</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Полулюкс</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
+         <widget class="QLineEdit" name="HalfLuxRoomCount">
+          <property name="text">
+           <string>2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Двуместный</string>
           </property>
          </widget>
         </item>
@@ -56,41 +122,38 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="SingleRoomCount">
-          <property name="text">
-           <string>12</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Одноместный</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Стоимости номеров</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Двуместный</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="2">
          <widget class="QLabel" name="label_6">
           <property name="text">
            <string>Колличество номеров</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QLineEdit" name="HalfLuxRoomCost">
+          <property name="text">
+           <string>8000</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>Люкс</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLineEdit" name="LuxRoomCost">
+          <property name="text">
+           <string>10000</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2">
+         <widget class="QLineEdit" name="LuxRoomCount">
+          <property name="text">
+           <string>1</string>
           </property>
          </widget>
         </item>
@@ -119,6 +182,13 @@
           </property>
          </widget>
         </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Число дней для эмуляции</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="EmulationStep">
           <property name="text">
@@ -133,18 +203,32 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>Число дней для эмуляции</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QLineEdit" name="NumberOfDaysToEmulate">
           <property name="text">
            <string>20</string>
           </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>Алгоритм бронирования</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QComboBox" name="BookingSystemType">
+          <item>
+           <property name="text">
+            <string>Trivial</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Smart</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>
@@ -153,11 +237,15 @@
     </item>
     <item>
      <widget class="QWidget" name="widget" native="true">
-      <layout class="QGridLayout" name="gridLayout_4">
+      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0">
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="2" column="1">
-          <widget class="QTextBrowser" name="BusyDouble"/>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Занято</string>
+           </property>
+          </widget>
          </item>
          <item row="0" column="2">
           <widget class="QLabel" name="label_12">
@@ -166,19 +254,17 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="2">
-          <widget class="QTextBrowser" name="FreeSingle"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QTextBrowser" name="BusySingle"/>
-         </item>
-         <item row="2" column="2">
-          <widget class="QTextBrowser" name="FreeDouble"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="label_11">
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_19">
            <property name="text">
-            <string>Занято</string>
+            <string>Полулюкс</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>Двуместный с диваном</string>
            </property>
           </widget>
          </item>
@@ -196,6 +282,83 @@
            </property>
           </widget>
          </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>Люкс</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="BusySingle">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLineEdit" name="FreeSingle">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="BusyDouble">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QLineEdit" name="FreeDouble">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="BusyDoubleWithSofa">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QLineEdit" name="FreeDoubleWithSofa">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="BusyHalfLux">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QLineEdit" name="FreeHalfLux">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="BusyLux">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="QLineEdit" name="FreeLux">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item row="0" column="1">
@@ -204,7 +367,11 @@
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QTextBrowser" name="CurrentTime"/>
+          <widget class="QLineEdit" name="CurrentTime">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_8">
@@ -214,7 +381,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextBrowser" name="TotalHotelProfit"/>
+          <widget class="QLineEdit" name="TotalHotelProfit">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

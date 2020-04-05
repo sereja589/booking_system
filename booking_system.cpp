@@ -16,8 +16,9 @@ namespace {
                     throw std::runtime_error("Room count is not set for type " + RoomTypeToString(roomType));
                 }
             }
-            BusyRooms[ERoomType::Single];
-            BusyRooms[ERoomType::Double];
+            for (const auto roomType : ROOM_TYPES) {
+                BusyRooms[roomType];
+            }
         }
 
         bool Has(ERoomType roomType, unsigned dayFrom, unsigned dayTo) const {
@@ -108,6 +109,67 @@ namespace {
         TRoomCosts RoomCosts;
         const IClock& Clock;
     };
+
+    std::vector<ERoomType> GetOtherSuitableRoomTypes(ERoomType roomType) {
+        auto it = std::find(std::begin(ROOM_TYPES), std::end(ROOM_TYPES), roomType);
+        if (it == std::end(ROOM_TYPES)) {
+            throw std::runtime_error("Invalid value of enum ERoomType");
+        }
+        ++it;
+        std::vector<ERoomType> result;
+        while (it != std::end(ROOM_TYPES)) {
+            result.push_back(*it);
+            ++it;
+        }
+        return result;
+    }
+
+    class TSmartBookingSystem : public IBookingSystem {
+    public:
+        TSmartBookingSystem(TRoomCounts roomCounts, TRoomCosts roomCosts, const IClock& clock)
+            : HotelPlan(std::move(roomCounts))
+            , RoomCosts(std::move(roomCosts))
+            , Clock(clock)
+        {
+        }
+
+        bool Book(const TBooking& booking) override {
+            if (HotelPlan.Has(booking.RoomType, booking.DayFrom, booking.DayTo)) {
+                HotelPlan.Book(booking.UserId, booking.RoomType, booking.DayFrom, booking.DayTo);
+                return true;
+            }
+            const auto suitableRoomTypes = GetOtherSuitableRoomTypes(booking.RoomType);
+            for (size_t i = 0; i < suitableRoomTypes.size(); ++i) {
+
+            }
+            return false;
+        }
+
+        bool CheckInto(const TBooking& booking) override {
+            const auto dayCount = booking.DayTo - booking.DayFrom + 1;
+            if (dayCount == 0) {
+                throw std::runtime_error("dayCount should be great than 0");
+            }
+            const auto currentDate = Clock.GetTime().Day;
+            if (currentDate < booking.DayFrom) {
+                throw std::runtime_error("booking starts on " + std::to_string(currentDate)
+                    + " but now is " + std::to_string(currentDate));
+            }
+            if (HotelPlan.HasBooking(booking.UserId, booking.RoomType, currentDate, booking.DayTo)) {
+                return true;
+            }
+            return false;
+        }
+
+        TCost GetBill(const TBooking &booking) override {
+            return RoomCosts.at(booking.RoomType);
+        }
+
+    private:
+        THotelPlan HotelPlan;
+        TRoomCosts RoomCosts;
+        const IClock& Clock;
+    };
 }
 
 std::string RoomTypeToString(ERoomType roomType) {
@@ -127,5 +189,7 @@ std::unique_ptr<IBookingSystem> IBookingSystem::Create(
     switch (type) {
         case IBookingSystem::EType::Trivial:
             return std::make_unique<TTrivialBookingSystem>(std::move(roomCounts), std::move(roomCosts), clock);
+        case IBookingSystem::EType::Smart:
+            return std::make_unique<TSmartBookingSystem>(std::move(roomCounts), std::move(roomCosts), clock);
     }
 }

@@ -3,6 +3,7 @@
 
 #include <QLineEdit>
 #include <QMainWindow>
+#include <QTextBrowser>
 #include <QTimer>
 #include "emulator.h"
 #include <memory>
@@ -107,6 +108,7 @@ private:
     unsigned GetEmulateStep() const;
     unsigned GetIntervalBetweenStep() const;
     unsigned GetDaysToEmulate() const;
+    IBookingSystem::EType GetBookingSystemType() const;
     void InitRoomCounts();
     void InitRoomCosts();
 
@@ -128,6 +130,9 @@ private:
 
     std::unordered_map<ERoomType, const QLineEdit*> RoomCountInputs;
     std::unordered_map<ERoomType, const QLineEdit*> RoomCostInputs;
+
+    std::unordered_map<ERoomType, QLineEdit*> OutputsOfBusyRooms;
+    std::unordered_map<ERoomType, QLineEdit*> OutputsOfFreeRooms;
 
     TRoomCosts RoomCosts;
     TRoomCounts RoomCounts;

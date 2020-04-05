@@ -51,23 +51,21 @@ TStartWindow::TStartWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    auto checkContainerHasAllRoomTypes = [](const auto& c) {
-        return std::all_of(std::begin(ROOM_TYPES), std::end(ROOM_TYPES), [&c](ERoomType roomType) {
-            return c.count(roomType);
-        });
-    };
+#define X(Id) RoomCountInputs[ERoomType::Id] = ui->Id##RoomCount;
+    ROOMS
+#undef X
 
-    RoomCountInputs[ERoomType::Single] = ui->SingleRoomCount;
-    RoomCountInputs[ERoomType::Double] = ui->DoubleRoomCount;
-    if (!checkContainerHasAllRoomTypes(RoomCountInputs)) {
-        throw std::runtime_error("RoomCountInputs does not contain some room type");
-    }
+#define X(Id) RoomCostInputs[ERoomType::Id] = ui->Id##RoomCost;
+    ROOMS
+#undef X
 
-    RoomCostInputs[ERoomType::Single] = ui->SingleRoomCost;
-    RoomCostInputs[ERoomType::Double] = ui->DoubleRoomCost;
-    if (!checkContainerHasAllRoomTypes(RoomCostInputs)) {
-        throw std::runtime_error("RoomCostInputs does not contain some room type");
-    }
+#define X(Id) OutputsOfBusyRooms[ERoomType::Id] = ui->Busy##Id;
+    ROOMS
+#undef X
+
+#define X(Id) OutputsOfFreeRooms[ERoomType::Id] = ui->Free##Id;
+    ROOMS
+#undef X
 }
 
 TStartWindow::~TStartWindow() {
@@ -78,17 +76,19 @@ TStartWindow::~TStartWindow() {
 void TStartWindow::on_StartEmulate_clicked() {
     InitRoomCounts();
     InitRoomCosts();
-    BusyRooms[ERoomType::Single] = 0;
-    BusyRooms[ERoomType::Double] = 0;
-
+    for (const auto roomType : ROOM_TYPES) {
+        BusyRooms[roomType] = 0;
+    }
     TotalProfit = 0;
-
     HotelStats = std::make_unique<THotelStats>(RoomCounts);
 
+    ui->ActionView->clear();
+
     Clock = std::make_unique<TClock>();
-    BookingSystem = IBookingSystem::Create(RoomCounts, RoomCosts, IBookingSystem::EType::Trivial, *Clock);
+    BookingSystem = IBookingSystem::Create(RoomCounts, RoomCosts, GetBookingSystemType(), *Clock);
     Emulator = IEmulator::Create({*BookingSystem, *Clock});
     Emulator->AddObserver(*this);
+
     DisplayRoomCounts();
     DisplayTime();
     DisplayProfit();
@@ -157,6 +157,16 @@ unsigned TStartWindow::GetDaysToEmulate() const {
     return days;
 }
 
+IBookingSystem::EType TStartWindow::GetBookingSystemType() const {
+    const auto type = ui->BookingSystemType->currentText();
+    if (type == "Trivial") {
+        return IBookingSystem::EType::Trivial;
+    } else if (type == "Smart") {
+        return IBookingSystem::EType::Smart;
+    }
+    throw std::runtime_error("Unknown booking system type " + type.toStdString());
+}
+
 void TStartWindow::InitRoomCounts() {
     for (const auto roomType : ROOM_TYPES) {
         const auto* line = RoomCountInputs.at(roomType);
@@ -212,10 +222,11 @@ void TStartWindow::OnCheckout(const TBooking& booking, TCost cost) {
 }
 
 void TStartWindow::DisplayRoomCounts() {
-    ui->FreeSingle->setText(QString::number(RoomCounts.at(ERoomType::Single) - BusyRooms.at(ERoomType::Single)));
-    ui->FreeDouble->setText(QString::number(RoomCounts.at(ERoomType::Double) - BusyRooms.at(ERoomType::Double)));
-    ui->BusySingle->setText(QString::number(BusyRooms.at(ERoomType::Single)));
-    ui->BusyDouble->setText(QString::number(BusyRooms.at(ERoomType::Double)));
+    for (const auto roomType : ROOM_TYPES) {
+        const auto freeRooms = RoomCounts.at(roomType) - BusyRooms.at(roomType);
+        OutputsOfFreeRooms[roomType]->setText(QString::number(freeRooms));
+        OutputsOfBusyRooms[roomType]->setText(QString::number(BusyRooms.at(roomType)));
+    }
 }
 
 void TStartWindow::DisplayTime() {

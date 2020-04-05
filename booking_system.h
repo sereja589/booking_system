@@ -7,7 +7,10 @@
 
 #define ROOMS \
     X(Single) \
-    X(Double)
+    X(Double) \
+    X(DoubleWithSofa) \
+    X(HalfLux) \
+    X(Lux)
 
 enum class ERoomType {
 #define X(Id) Id,
@@ -41,7 +44,8 @@ using TDateGetter = std::function<unsigned()>;
 class IBookingSystem {
 public:
     enum class EType {
-        Trivial
+        Trivial,
+        Smart
     };
 
 public:
