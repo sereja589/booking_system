@@ -4,6 +4,47 @@
 #include <vector>
 
 namespace {
+    using TRoomTypeGenerationWeights = std::unordered_map<ERoomType, unsigned>;
+
+    std::discrete_distribution<size_t> GetDistribution(const TRoomTypeGenerationWeights& weights) {
+        const auto allWeights = [&]() {
+            std::vector<int> result;
+            result.resize(ROOM_TYPES.size());
+            for (size_t i = 0; i < ROOM_TYPES.size(); ++i) {
+                const auto t = ROOM_TYPES[i];
+                result[i] = weights.count(t) ? weights.at(t) : 0;
+            }
+            return result;
+        }();
+
+        return std::discrete_distribution<size_t>(allWeights.begin(), allWeights.end());
+    }
+
+    class TRoomTypeDistribution {
+    public:
+        TRoomTypeDistribution(const TRoomTypeGenerationWeights& weights)
+            : Distribution(GetDistribution(weights))
+        {
+        }
+
+        template <typename TGenerator>
+        ERoomType operator()(TGenerator& generator) {
+            const auto pos = Distribution(generator);
+            return ROOM_TYPES[pos];
+        }
+
+    private:
+        std::discrete_distribution<size_t> Distribution;
+    };
+
+    const TRoomTypeGenerationWeights ROOM_TYPE_GENERATION_WEIGHTS = {
+        {ERoomType::Single, 10},
+        {ERoomType::Double, 7},
+        {ERoomType::DoubleWithSofa, 5},
+        {ERoomType::HalfLux, 2},
+        {ERoomType::Lux, 1}
+    };
+
     class TSimpleEmulator : public IEmulator {
     public:
         explicit TSimpleEmulator(const TContext& context)
@@ -98,7 +139,7 @@ namespace {
         }
 
         ERoomType GenerateRoomType() {
-            return static_cast<ERoomType>(RoomTypeDistribution(RandomGenerator));
+            return RoomTypeDistribution(RandomGenerator);
         }
 
     private:
@@ -111,7 +152,7 @@ namespace {
         std::uniform_int_distribution<unsigned> DistributionOfIntervalBetweenBookings{1, 5};
         std::uniform_int_distribution<unsigned> DaysUntilBookingDistribution{1, 10};
         std::uniform_int_distribution<unsigned> BookingDurationDistribution{1, 10};
-        std::uniform_int_distribution<int> RoomTypeDistribution{0, static_cast<int>(ROOM_TYPES.size()) - 1};
+        TRoomTypeDistribution RoomTypeDistribution{ROOM_TYPE_GENERATION_WEIGHTS};
         TUserId UserId = 0;
     };
 }
