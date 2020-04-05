@@ -38,8 +38,6 @@ struct TBooking {
     unsigned DayTo;
 };
 
-using TDateGetter = std::function<unsigned()>;
-
 // Отвечает за стратегию бронироования номеров
 class IBookingSystem {
 public:

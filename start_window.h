@@ -1,9 +1,7 @@
-#ifndef TSTARTWINDOW_H
-#define TSTARTWINDOW_H
+#pragma once
 
 #include <QLineEdit>
 #include <QMainWindow>
-#include <QTextBrowser>
 #include <QTimer>
 #include "emulator.h"
 #include <memory>
@@ -72,7 +70,7 @@ public:
         return std::reduce(occupancy.begin(), occupancy.end()) / occupancy.size();
     }
 
-    // Можно ли так?
+    // TODO Можно ли так?
     double GetRoomOccupancy() const {
         double occupancy = 0;
         unsigned totalRoomCounts = 0;
@@ -109,6 +107,7 @@ private:
     unsigned GetIntervalBetweenStep() const;
     unsigned GetDaysToEmulate() const;
     IBookingSystem::EType GetBookingSystemType() const;
+
     void InitRoomCounts();
     void InitRoomCosts();
 
@@ -119,10 +118,8 @@ private:
     void DisplayRoomCounts();
     void DisplayTime();
     void DisplayProfit();
-
     void ClearEvents();
     void DisplayLastEvents();
-
     void DisplayStat();
 
 private:
@@ -151,4 +148,3 @@ private:
     std::unique_ptr<IEmulator> Emulator;
     QTimer EmulationTimer;
 };
-#endif // TSTARTWINDOW_H
