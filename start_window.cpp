@@ -110,11 +110,21 @@ void TStartWindow::on_MakeStep_clicked() {
         }
     }
     DisplayTime();
+    if (EmulationTimer.isActive() && dayAfterAdd > GetDaysToEmulate()) {
+        on_StopEmulation_clicked();
+    }
 }
 
-
 void TStartWindow::on_StopEmulation_clicked() {
+    EmulationTimer.stop();
     DisplayStat();
+}
+
+void TStartWindow::on_StartEmulationAutomatically_clicked() {
+    on_StartEmulate_clicked();
+    const auto interval = GetIntervalBetweenStep();
+    connect(&EmulationTimer, &QTimer::timeout, this, &TStartWindow::on_MakeStep_clicked);
+    EmulationTimer.start(interval * 1000);
 }
 
 unsigned TStartWindow::GetEmulateStep() const {
@@ -127,6 +137,24 @@ unsigned TStartWindow::GetEmulateStep() const {
         throw std::runtime_error("Emulation step must be less or equal 24 hours");
     }
     return result;
+}
+
+unsigned TStartWindow::GetIntervalBetweenStep() const {
+    bool ok = false;
+    const auto interval = ui->IntervalBetweenSteps->text().toUInt(&ok);
+    if (!ok) {
+        throw std::runtime_error("Interval between steps must be unsigned int");
+    }
+    return interval;
+}
+
+unsigned TStartWindow::GetDaysToEmulate() const {
+    bool ok = false;
+    const auto days = ui->NumberOfDaysToEmulate->text().toUInt(&ok);
+    if (!ok) {
+        return std::numeric_limits<unsigned>::max();
+    }
+    return days;
 }
 
 void TStartWindow::InitRoomCounts() {

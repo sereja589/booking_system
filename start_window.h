@@ -3,6 +3,7 @@
 
 #include <QLineEdit>
 #include <QMainWindow>
+#include <QTimer>
 #include "emulator.h"
 #include <memory>
 
@@ -89,8 +90,7 @@ private:
     std::unordered_map<ERoomType, std::vector<double>> RoomsOccupancy;
 };
 
-class TStartWindow : public QMainWindow, public IEmulatorObserver
-{
+class TStartWindow : public QMainWindow, public IEmulatorObserver {
     Q_OBJECT
 
 public:
@@ -101,9 +101,12 @@ private slots:
     void on_StartEmulate_clicked();
     void on_MakeStep_clicked();
     void on_StopEmulation_clicked();
+    void on_StartEmulationAutomatically_clicked();
 
 private:
     unsigned GetEmulateStep() const;
+    unsigned GetIntervalBetweenStep() const;
+    unsigned GetDaysToEmulate() const;
     void InitRoomCounts();
     void InitRoomCosts();
 
@@ -141,5 +144,6 @@ private:
     std::unique_ptr<TClock> Clock;
     std::unique_ptr<IBookingSystem> BookingSystem;
     std::unique_ptr<IEmulator> Emulator;
+    QTimer EmulationTimer;
 };
 #endif // TSTARTWINDOW_H
