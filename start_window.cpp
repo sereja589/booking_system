@@ -1,6 +1,6 @@
 #include "start_window.h"
 #include "./ui_start_window.h"
-#include <QGraphicsTextItem>
+#include <QErrorMessage>
 #include <QDebug>
 
 #include "emulator.h"
@@ -106,6 +106,8 @@ TStartWindow::TStartWindow(QWidget *parent)
 #define X(Id) OutputsOfFreeRooms[ERoomType::Id] = ui->Free##Id;
     ROOMS
 #undef X
+
+    connect(&EmulationTimer, &QTimer::timeout, this, &TStartWindow::on_MakeStep_clicked);
 }
 
 TStartWindow::~TStartWindow() {
@@ -114,44 +116,55 @@ TStartWindow::~TStartWindow() {
 
 
 void TStartWindow::on_StartEmulate_clicked() {
-    InitRoomCounts();
-    InitRoomCosts();
-    for (const auto roomType : ROOM_TYPES) {
-        BusyRooms[roomType] = 0;
+    try {
+        InitRoomCounts();
+        InitRoomCosts();
+        for (const auto roomType : ROOM_TYPES) {
+            BusyRooms[roomType] = 0;
+        }
+        TotalProfit = 0;
+        HotelStats = std::make_unique<THotelStats>(RoomCounts);
+
+        ui->ActionView->clear();
+
+        Clock = std::make_unique<TClock>();
+        BookingSystem = IBookingSystem::Create(RoomCounts, RoomCosts, GetBookingSystemType(), *Clock);
+        Emulator = IEmulator::Create({*BookingSystem, *Clock});
+        Emulator->AddObserver(*this);
+
+        DisplayRoomCounts();
+        DisplayTime();
+        DisplayProfit();
+    } catch (const std::exception& e) {
+        ReportError(e.what());
     }
-    TotalProfit = 0;
-    HotelStats = std::make_unique<THotelStats>(RoomCounts);
-
-    ui->ActionView->clear();
-
-    Clock = std::make_unique<TClock>();
-    BookingSystem = IBookingSystem::Create(RoomCounts, RoomCosts, GetBookingSystemType(), *Clock);
-    Emulator = IEmulator::Create({*BookingSystem, *Clock});
-    Emulator->AddObserver(*this);
-
-    DisplayRoomCounts();
-    DisplayTime();
-    DisplayProfit();
 }
 
 void TStartWindow::on_MakeStep_clicked() {
-    const auto step = GetEmulateStep();
-    ClearEvents();
-    Emulator->MakeStep();
-    DisplayLastEvents();
-    const auto dayBeforeAdd = Clock->GetTime().Day;
-    Clock->Add(step);
-    const auto dayAfterAdd = Clock->GetTime().Day;
-    if (dayBeforeAdd != dayAfterAdd) {
-        for (const auto roomType : ROOM_TYPES) {
-            const auto totalCount = RoomCounts.at(roomType);
-            const auto busyCount = BusyRooms.at(roomType);
-            HotelStats->AddRoomsOccupanccy(roomType, dayBeforeAdd, static_cast<double>(busyCount) / totalCount);
-        }
+    if (!Emulator) {
+        return;
     }
-    DisplayTime();
-    if (EmulationTimer.isActive() && dayAfterAdd > GetDaysToEmulate()) {
-        on_StopEmulation_clicked();
+    try {
+        const auto step = GetEmulateStep();
+        ClearEvents();
+        Emulator->MakeStep();
+        DisplayLastEvents();
+        const auto dayBeforeAdd = Clock->GetTime().Day;
+        Clock->Add(step);
+        const auto dayAfterAdd = Clock->GetTime().Day;
+        if (dayBeforeAdd != dayAfterAdd) {
+            for (const auto roomType : ROOM_TYPES) {
+                const auto totalCount = RoomCounts.at(roomType);
+                const auto busyCount = BusyRooms.at(roomType);
+                HotelStats->AddRoomsOccupanccy(roomType, dayBeforeAdd, static_cast<double>(busyCount) / totalCount);
+            }
+        }
+        DisplayTime();
+        if (EmulationTimer.isActive() && dayAfterAdd > GetDaysToEmulate()) {
+            on_StopEmulation_clicked();
+        }
+    } catch (const std::exception& e) {
+        ReportError(e.what());
     }
 }
 
@@ -161,10 +174,13 @@ void TStartWindow::on_StopEmulation_clicked() {
 }
 
 void TStartWindow::on_StartEmulationAutomatically_clicked() {
-    on_StartEmulate_clicked();
-    const auto interval = GetIntervalBetweenStep();
-    connect(&EmulationTimer, &QTimer::timeout, this, &TStartWindow::on_MakeStep_clicked);
-    EmulationTimer.start(interval * 1000);
+    try {
+        on_StartEmulate_clicked();
+        const auto interval = GetIntervalBetweenStep();
+        EmulationTimer.start(interval * 1000);
+    } catch (const std::exception& e) {
+        ReportError(e.what());
+    }
 }
 
 unsigned TStartWindow::GetEmulateStep() const {
@@ -232,8 +248,6 @@ void TStartWindow::InitRoomCosts() {
 }
 
 void TStartWindow::OnBook(const TBooking& booking, bool success) {
-    qDebug() << "Book " << static_cast<int>(booking.RoomType)
-        << " from " << booking.DayFrom << " to " << booking.DayTo << " success " << success;
     Bookings.push_back({booking, success});
     if (success) {
         HotelStats->AddAcceptedBooking();
@@ -243,8 +257,6 @@ void TStartWindow::OnBook(const TBooking& booking, bool success) {
 }
 
 void TStartWindow::OnCheckin(const TBooking& booking, bool success) {
-    qDebug() << "Checkin " << static_cast<int>(booking.RoomType)
-        << " from " << booking.DayFrom << " to " << booking.DayTo << " success " << success;
     if (success) {
         ++BusyRooms[booking.RoomType];
     }
@@ -253,7 +265,6 @@ void TStartWindow::OnCheckin(const TBooking& booking, bool success) {
 }
 
 void TStartWindow::OnCheckout(const TBooking& booking, TCost cost) {
-    qDebug("checkout");
     --BusyRooms[booking.RoomType];
     TotalProfit += cost;
     Checkouts.push_back({booking, cost});
@@ -314,4 +325,9 @@ void TStartWindow::DisplayStat() {
     }
     text << "    Гостиница в целом:" << HotelStats->GetRoomOccupancy() * 100 << "%<br>";
     ui->ActionView->setHtml(QString::fromStdString(text.str()));
+}
+
+void TStartWindow::ReportError(const std::string& message) {
+    auto* errorMessage = new QErrorMessage(this);
+    errorMessage->showMessage(QString::fromStdString(message));
 }

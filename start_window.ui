@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>864</width>
+    <width>891</width>
     <height>584</height>
    </rect>
   </property>
@@ -221,12 +221,12 @@
          <widget class="QComboBox" name="BookingSystemType">
           <item>
            <property name="text">
-            <string>Trivial</string>
+            <string>Smart</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Smart</string>
+            <string>Trivial</string>
            </property>
           </item>
          </widget>
@@ -431,7 +431,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>864</width>
+     <width>891</width>
      <height>22</height>
     </rect>
    </property>

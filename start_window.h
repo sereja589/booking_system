@@ -122,6 +122,8 @@ private:
     void DisplayLastEvents();
     void DisplayStat();
 
+    void ReportError(const std::string& message);
+
 private:
     Ui::TStartWindow* ui;
 
