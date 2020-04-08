@@ -70,7 +70,6 @@ public:
         return std::reduce(occupancy.begin(), occupancy.end()) / occupancy.size();
     }
 
-    // TODO Можно ли так?
     double GetRoomOccupancy() const {
         double occupancy = 0;
         unsigned totalRoomCounts = 0;

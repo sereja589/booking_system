@@ -11,42 +11,38 @@ namespace  {
     constexpr unsigned HOURS_IN_DAY = 24;
 
     enum ECase {
+        Nominative,
         Genitive,
         Accusative
     };
 
     std::string RussianRoomType(ERoomType roomType, ECase aCase) {
+        const auto selectName = [aCase](
+            std::string_view nominativeName,
+            std::string_view genitiveName,
+            std::string_view accusativeName
+        ) {
+            switch (aCase) {
+                case ECase::Nominative:
+                    return std::string(nominativeName);
+                case ECase::Genitive:
+                    return std::string(genitiveName);
+                case ECase::Accusative:
+                    return std::string(accusativeName);
+            }
+        };
+
         switch (roomType) {
             case ERoomType::Single:
-                if (aCase == ECase::Accusative) {
-                    return "одноместную комнату";
-                } else {
-                    return "одноместной комнаты";
-                }
+                return selectName("одноместная комната", "одноместной комнаты", "одноместную комнату");
             case ERoomType::Double:
-                if (aCase == ECase::Accusative) {
-                    return "двухместную комнату";
-                } else {
-                    return "двухместной комнаты";
-                }
+                return selectName("двухместная комната", "двухместной комнаты", "двухместную комнату");
             case ERoomType::DoubleWithSofa:
-                if (aCase == ECase::Accusative) {
-                    return "двухместную комнату с диваном";
-                } else {
-                    return "двухместной комнаты c диваном";
-                }
+                return selectName("двухместная комната с диваном", "двухместной комнаты c диваном", "двухместную комнату с диваном");
             case ERoomType::HalfLux:
-                if (aCase == ECase::Accusative) {
-                    return "полулюкс";
-                } else {
-                    return "полулюкса";
-                }
+                return selectName("полулюкс", "полулюкса", "полулюкс");
             case ERoomType::Lux:
-                if (aCase == ECase::Accusative) {
-                    return "люкс";
-                } else {
-                    return "люкса";
-                }
+                return selectName("люкс", "люкса", "люкс");
         }
     }
 
@@ -318,10 +314,11 @@ void TStartWindow::DisplayLastEvents() {
 void TStartWindow::DisplayStat() {
     std::stringstream text;
 
+    text << "Сделано бронирований " << HotelStats->GetTotalBookings() << "<br>";
     text << "Из них подтверждено: " << HotelStats->GetAcceptedBookings() << "<br>";
     text << "Загрузка гостиницы:<br>";
     for (const auto roomType : ROOM_TYPES) {
-        text << "    " << RoomTypeToString(roomType) << ": " << HotelStats->GetRoomOccupancy(roomType) * 100 << "%<br>";
+        text << "    " << RussianRoomType(roomType, ECase::Nominative) << ": " << HotelStats->GetRoomOccupancy(roomType) * 100 << "%<br>";
     }
     text << "    Гостиница в целом:" << HotelStats->GetRoomOccupancy() * 100 << "%<br>";
     ui->ActionView->setHtml(QString::fromStdString(text.str()));
