@@ -125,7 +125,7 @@
         <item row="0" column="2">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Колличество номеров</string>
+           <string>Количество номеров</string>
           </property>
          </widget>
         </item>

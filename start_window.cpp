@@ -279,7 +279,7 @@ void TStartWindow::DisplayRoomCounts() {
 void TStartWindow::DisplayTime() {
     const auto time = Clock->GetTime();
     std::stringstream timeStr;
-    timeStr << "Day " << time.Day << ", hour " << time.Hour;
+    timeStr << "День " << time.Day << ", час " << time.Hour;
     ui->CurrentTime->setText(QString::fromStdString(timeStr.str()));
 }
 
@@ -314,7 +314,7 @@ void TStartWindow::DisplayLastEvents() {
 void TStartWindow::DisplayStat() {
     std::stringstream text;
 
-    text << "Сделано бронирований " << HotelStats->GetTotalBookings() << "<br>";
+    text << "Сделано бронирований: " << HotelStats->GetTotalBookings() << "<br>";
     text << "Из них подтверждено: " << HotelStats->GetAcceptedBookings() << "<br>";
     text << "Загрузка гостиницы:<br>";
     for (const auto roomType : ROOM_TYPES) {
